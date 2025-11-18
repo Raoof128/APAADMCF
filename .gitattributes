@@ -1,0 +1,79 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source code
+*.py text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.sql text eol=lf
+*.sh text eol=lf
+
+# Configuration files
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+
+# Docker
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+
+# Documentation
+*.txt text eol=lf
+*.markdown text eol=lf
+*.rst text eol=lf
+LICENSE text eol=lf
+README* text eol=lf
+
+# Graphics
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+
+# Archives
+*.7z binary
+*.gz binary
+*.tar binary
+*.zip binary
+
+# Fonts
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.otf binary
+
+# Executables
+*.exe binary
+*.pyc binary
+
+# Python
+*.pkl binary
+*.pickle binary
+*.db binary
+*.sqlite binary
+
+# Exclude files from export
+.gitattributes export-ignore
+.gitignore export-ignore
+.github/ export-ignore
+tests/ export-ignore
+*.test.py export-ignore
+*.spec.ts export-ignore
+
+# Linguist language overrides
+*.sql linguist-language=SQL
+*.tf linguist-language=HCL
+docs/** linguist-documentation
+*.md linguist-documentation

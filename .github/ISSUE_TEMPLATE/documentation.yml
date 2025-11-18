@@ -1,0 +1,85 @@
+name: Documentation Issue
+description: Report missing or incorrect documentation
+title: "[Docs]: "
+labels: ["documentation", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve our documentation! Please provide details about what needs to be documented or corrected.
+
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation is affected?
+      options:
+        - User Guide
+        - API Documentation
+        - Developer Guide
+        - Deployment Guide
+        - Architecture Documentation
+        - Code Comments
+        - README
+        - Contributing Guidelines
+        - Security Documentation
+        - Compliance Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue is this?
+      options:
+        - Missing documentation
+        - Incorrect information
+        - Unclear explanation
+        - Outdated content
+        - Broken links
+        - Formatting issues
+        - Translation needed
+        - Example needed
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the documentation issue
+      placeholder: What documentation is missing, incorrect, or unclear?
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      description: Where is (or should be) this documentation?
+      placeholder: "e.g., docs/api/endpoints.md or README.md section 'Quick Start'"
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Content
+      description: If applicable, quote the current incorrect or unclear content
+      placeholder: Quote the current documentation
+
+  - type: textarea
+    id: suggested
+    attributes:
+      label: Suggested Improvement
+      description: How should the documentation be improved?
+      placeholder: Provide suggested corrections or additions
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other information about this documentation issue
+      placeholder: Add any other context

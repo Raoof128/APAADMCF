@@ -1,0 +1,967 @@
+{
+  "info": {
+    "name": "ADM Compliance Framework API",
+    "description": "Comprehensive API collection for the Australian Privacy Act ADM Compliance Framework. This collection includes all endpoints for authentication, ADM system registry, privacy impact assessments, fairness assessments, individual rights requests, and compliance monitoring.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adm_system_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pia_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fairness_assessment_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "request_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has user ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"privacy.officer@example.gov.au\",\n  \"password\": \"SecurePassword123!\",\n  \"full_name\": \"Jane Smith\",\n  \"role\": \"privacy_officer\",\n  \"organization\": \"Example Government Department\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user account. Available roles: system_admin, privacy_officer, data_scientist, auditor, business_user, individual."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Has access token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access_token');",
+                  "    pm.expect(jsonData).to.have.property('refresh_token');",
+                  "    ",
+                  "    // Save tokens to collection variables",
+                  "    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+                  "    pm.collectionVariables.set(\"refresh_token\", jsonData.refresh_token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"privacy.officer@example.gov.au\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticate user and receive JWT access token and refresh token."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Has user details\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "    pm.expect(jsonData).to.have.property('role');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get current authenticated user details."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Has new access token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access_token');",
+                  "    pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Get a new access token using refresh token."
+          },
+          "response": []
+        }
+      ],
+      "description": "User authentication endpoints including registration, login, and token management."
+    },
+    {
+      "name": "ADM Systems",
+      "item": [
+        {
+          "name": "Create ADM System",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Has ADM system ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.collectionVariables.set(\"adm_system_id\", jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Welfare Payment Eligibility System\",\n  \"description\": \"Automated system for determining eligibility for welfare payments based on income, assets, and household composition.\",\n  \"business_unit\": \"Department of Social Services\",\n  \"decision_type\": \"eligibility\",\n  \"impact_level\": \"high\",\n  \"deployment_status\": \"production\",\n  \"affected_population_size\": 2500000,\n  \"decisions_per_month\": 150000,\n  \"technology_stack\": \"Python ML model (Random Forest), deployed on Azure ML\",\n  \"data_sources\": [\"Centrelink database\", \"ATO income data\", \"MyGov submissions\"],\n  \"decision_criteria\": [\"Income thresholds\", \"Asset tests\", \"Residency status\", \"Age verification\"],\n  \"review_mechanism\": \"Human review available on request within 28 days\",\n  \"appeals_process\": \"Administrative Appeals Tribunal (AAT) review available\",\n  \"contact_email\": \"welfare.systems@dss.gov.au\",\n  \"contact_phone\": \"+61 2 6244 7788\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/adm-systems",
+              "host": ["{{base_url}}"],
+              "path": ["adm-systems"]
+            },
+            "description": "Register a new ADM system in the compliance framework."
+          },
+          "response": []
+        },
+        {
+          "name": "List ADM Systems",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Has items array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('items');",
+                  "    pm.expect(jsonData.items).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/adm-systems?skip=0&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["adm-systems"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "impact_level",
+                  "value": "high",
+                  "disabled": true
+                },
+                {
+                  "key": "decision_type",
+                  "value": "eligibility",
+                  "disabled": true
+                },
+                {
+                  "key": "compliance_status",
+                  "value": "compliant",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List all ADM systems with optional filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Get ADM System",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Has ADM system details\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('name');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/adm-systems/{{adm_system_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["adm-systems", "{{adm_system_id}}"]
+            },
+            "description": "Get detailed information about a specific ADM system."
+          },
+          "response": []
+        },
+        {
+          "name": "Update ADM System",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deployment_status\": \"production\",\n  \"decisions_per_month\": 175000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/adm-systems/{{adm_system_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["adm-systems", "{{adm_system_id}}"]
+            },
+            "description": "Update an existing ADM system."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete ADM System",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/adm-systems/{{adm_system_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["adm-systems", "{{adm_system_id}}"]
+            },
+            "description": "Delete an ADM system (soft delete)."
+          },
+          "response": []
+        },
+        {
+          "name": "Export ADM Systems (CSV)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/adm-systems/export?format=csv",
+              "host": ["{{base_url}}"],
+              "path": ["adm-systems", "export"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "csv"
+                }
+              ]
+            },
+            "description": "Export all ADM systems to CSV format."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for managing ADM system registry including creation, retrieval, updates, and deletion."
+    },
+    {
+      "name": "Privacy Impact Assessments",
+      "item": [
+        {
+          "name": "Create PIA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Has PIA ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.collectionVariables.set(\"pia_id\", jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adm_system_id\": \"{{adm_system_id}}\",\n  \"assessor_name\": \"Jane Smith\",\n  \"assessor_email\": \"jane.smith@example.gov.au\",\n  \"assessment_scope\": \"Full system assessment including data flows, security controls, and individual rights implementation\",\n  \"data_collected\": [\n    \"Full name\",\n    \"Date of birth\",\n    \"Tax File Number\",\n    \"Income records\",\n    \"Bank account details\",\n    \"Residential address\",\n    \"Family composition\"\n  ],\n  \"legal_basis\": \"Social Security Act 1991 - Section 192\",\n  \"data_retention_period_days\": 2555,\n  \"third_party_sharing\": true,\n  \"third_parties\": [\"Australian Taxation Office\", \"Department of Home Affairs\"],\n  \"international_transfers\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/pias",
+              "host": ["{{base_url}}"],
+              "path": ["pias"]
+            },
+            "description": "Create a new Privacy Impact Assessment for an ADM system."
+          },
+          "response": []
+        },
+        {
+          "name": "List PIAs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pias?skip=0&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["pias"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "status",
+                  "value": "completed",
+                  "disabled": true
+                },
+                {
+                  "key": "adm_system_id",
+                  "value": "{{adm_system_id}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List all PIAs with optional filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Get PIA",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pias/{{pia_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["pias", "{{pia_id}}"]
+            },
+            "description": "Get detailed PIA information including risk assessments and mitigation actions."
+          },
+          "response": []
+        },
+        {
+          "name": "Complete PIA",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"risk_assessments\": [\n    {\n      \"risk_category\": \"Unauthorized Access\",\n      \"severity\": \"high\",\n      \"likelihood\": 0.3,\n      \"impact_score\": 0.9,\n      \"description\": \"Potential for unauthorized access to sensitive welfare data\",\n      \"existing_controls\": \"Multi-factor authentication, role-based access control, audit logging\",\n      \"residual_risk\": \"medium\"\n    },\n    {\n      \"risk_category\": \"Algorithmic Bias\",\n      \"severity\": \"high\",\n      \"likelihood\": 0.4,\n      \"impact_score\": 0.8,\n      \"description\": \"Potential for discriminatory outcomes against protected groups\",\n      \"existing_controls\": \"Fairness testing, diverse training data, human oversight\",\n      \"residual_risk\": \"medium\"\n    }\n  ],\n  \"mitigation_actions\": [\n    {\n      \"action\": \"Implement quarterly fairness audits\",\n      \"priority\": \"high\",\n      \"responsible_party\": \"Data Science Team\",\n      \"due_date\": \"2024-03-31\",\n      \"status\": \"planned\"\n    }\n  ],\n  \"recommendations\": \"1. Conduct annual PIA reviews\\n2. Implement real-time bias monitoring\\n3. Provide transparency notices to all affected individuals\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/pias/{{pia_id}}/complete",
+              "host": ["{{base_url}}"],
+              "path": ["pias", "{{pia_id}}", "complete"]
+            },
+            "description": "Complete a PIA with risk assessments and mitigation actions."
+          },
+          "response": []
+        },
+        {
+          "name": "Download PIA Report (PDF)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pias/{{pia_id}}/report",
+              "host": ["{{base_url}}"],
+              "path": ["pias", "{{pia_id}}", "report"]
+            },
+            "description": "Download PIA report as PDF."
+          },
+          "response": []
+        }
+      ],
+      "description": "Privacy Impact Assessment management endpoints."
+    },
+    {
+      "name": "Fairness Assessments",
+      "item": [
+        {
+          "name": "Create Fairness Assessment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Has assessment ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.collectionVariables.set(\"fairness_assessment_id\", jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adm_system_id\": \"{{adm_system_id}}\",\n  \"protected_attributes\": [\"gender\", \"age_group\", \"indigenous_status\"],\n  \"outcome_column\": \"approved\",\n  \"dataset\": {\n    \"records\": [\n      {\"gender\": \"male\", \"age_group\": \"25-34\", \"indigenous_status\": \"no\", \"approved\": 1, \"score\": 0.87},\n      {\"gender\": \"female\", \"age_group\": \"35-44\", \"indigenous_status\": \"no\", \"approved\": 1, \"score\": 0.92},\n      {\"gender\": \"male\", \"age_group\": \"45-54\", \"indigenous_status\": \"yes\", \"approved\": 0, \"score\": 0.42},\n      {\"gender\": \"female\", \"age_group\": \"25-34\", \"indigenous_status\": \"no\", \"approved\": 1, \"score\": 0.88}\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/fairness/assessments",
+              "host": ["{{base_url}}"],
+              "path": ["fairness", "assessments"]
+            },
+            "description": "Create a new fairness assessment. NOTE: This is a demo with minimal data. In production, upload a CSV file with thousands of records."
+          },
+          "response": []
+        },
+        {
+          "name": "List Fairness Assessments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/fairness/assessments?skip=0&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["fairness", "assessments"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "adm_system_id",
+                  "value": "{{adm_system_id}}",
+                  "disabled": true
+                },
+                {
+                  "key": "bias_detected",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List all fairness assessments."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Fairness Assessment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/fairness/assessments/{{fairness_assessment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["fairness", "assessments", "{{fairness_assessment_id}}"]
+            },
+            "description": "Get detailed fairness assessment results including all metrics."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Fairness Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/fairness/assessments/{{fairness_assessment_id}}/metrics?protected_attribute=gender",
+              "host": ["{{base_url}}"],
+              "path": ["fairness", "assessments", "{{fairness_assessment_id}}", "metrics"],
+              "query": [
+                {
+                  "key": "protected_attribute",
+                  "value": "gender"
+                }
+              ]
+            },
+            "description": "Get fairness metrics for a specific protected attribute."
+          },
+          "response": []
+        }
+      ],
+      "description": "Fairness assessment and bias detection endpoints."
+    },
+    {
+      "name": "Individual Rights Requests",
+      "item": [
+        {
+          "name": "Submit Access Request (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 202\", function () {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "",
+                  "pm.test(\"Has request ID and tracking ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('tracking_id');",
+                  "    pm.collectionVariables.set(\"request_id\", jsonData.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"request_type\": \"access\",\n  \"individual_name\": \"John Citizen\",\n  \"individual_email\": \"john.citizen@email.com\",\n  \"individual_phone\": \"+61 400 123 456\",\n  \"date_of_birth\": \"1985-03-15\",\n  \"identification_provided\": \"Drivers License: VIC123456\",\n  \"details\": \"I request access to all personal information held about me in the Welfare Payment Eligibility System, including decision records and assessment data.\",\n  \"preferred_format\": \"pdf\",\n  \"consent_to_verification\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/requests",
+              "host": ["{{base_url}}"],
+              "path": ["requests"]
+            },
+            "description": "Submit an individual rights request (public endpoint, no authentication required)."
+          },
+          "response": []
+        },
+        {
+          "name": "Track Request Status (Public)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/requests/ADM-2024-00123",
+              "host": ["{{base_url}}"],
+              "path": ["requests", "ADM-2024-00123"]
+            },
+            "description": "Track request status using tracking ID (public endpoint)."
+          },
+          "response": []
+        },
+        {
+          "name": "List Requests (Privacy Officer)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/requests?status=verified&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["requests"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "verified"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "request_type",
+                  "value": "access",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "0",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List all requests (requires privacy_officer role)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Request Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/requests/{{request_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["requests", "{{request_id}}"]
+            },
+            "description": "Get full request details (requires authentication)."
+          },
+          "response": []
+        },
+        {
+          "name": "Respond to Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"response_type\": \"approved\",\n  \"response_text\": \"Please find attached your personal information as requested. This includes all records from the Welfare Payment Eligibility System from 2020-2024.\",\n  \"documents\": [\n    {\n      \"filename\": \"personal_data_export.pdf\",\n      \"file_url\": \"https://secure.adm-compliance.gov.au/downloads/abc123\"\n    }\n  ],\n  \"notes\": \"Data exported on 2024-01-20, includes 15 decision records\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/requests/{{request_id}}/response",
+              "host": ["{{base_url}}"],
+              "path": ["requests", "{{request_id}}", "response"]
+            },
+            "description": "Provide a response to an individual rights request."
+          },
+          "response": []
+        }
+      ],
+      "description": "Individual rights request management (access, correction, erasure)."
+    },
+    {
+      "name": "Compliance Monitoring",
+      "item": [
+        {
+          "name": "Get Compliance Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/compliance/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "dashboard"]
+            },
+            "description": "Get compliance dashboard with overview metrics and trends."
+          },
+          "response": []
+        },
+        {
+          "name": "Run Compliance Check",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adm_system_id\": \"{{adm_system_id}}\",\n  \"check_types\": [\"pia_current\", \"fairness_assessed\", \"transparency_notice\", \"individual_rights\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/compliance/checks",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "checks"]
+            },
+            "description": "Run a compliance check for an ADM system."
+          },
+          "response": []
+        },
+        {
+          "name": "List Compliance Checks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/compliance/checks?adm_system_id={{adm_system_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "checks"],
+              "query": [
+                {
+                  "key": "adm_system_id",
+                  "value": "{{adm_system_id}}"
+                }
+              ]
+            },
+            "description": "List all compliance checks."
+          },
+          "response": []
+        }
+      ],
+      "description": "Compliance monitoring and dashboard endpoints."
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Generate Compliance Report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 202\", function () {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "",
+                  "pm.test(\"Has task ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('task_id');",
+                  "    pm.collectionVariables.set(\"report_task_id\", jsonData.task_id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"report_period_start\": \"2024-01-01\",\n  \"report_period_end\": \"2024-01-31\",\n  \"include_sections\": [\n    \"executive_summary\",\n    \"system_inventory\",\n    \"pia_summary\",\n    \"fairness_results\",\n    \"individual_requests\"\n  ],\n  \"format\": \"pdf\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reports/compliance",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "compliance"]
+            },
+            "description": "Generate a compliance report (async task)."
+          },
+          "response": []
+        },
+        {
+          "name": "Check Report Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reports/tasks/{{report_task_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "tasks", "{{report_task_id}}"]
+            },
+            "description": "Check status of report generation task."
+          },
+          "response": []
+        }
+      ],
+      "description": "Report generation and export endpoints."
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Check API health status (no authentication required)."
+          },
+          "response": []
+        }
+      ],
+      "description": "System health check endpoint."
+    }
+  ]
+}
