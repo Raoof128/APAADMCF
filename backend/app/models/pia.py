@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship
 import uuid
 
 from .base import Base, TimestampMixin
+from .adm_system import DecisionImpact
 
 
 class PIAStatus(str, enum.Enum):
@@ -51,7 +52,7 @@ class PIAAssessment(Base, TimestampMixin):
     sensitive_info_score = Column(Integer, CheckConstraint('sensitive_info_score BETWEEN 0 AND 100'))
 
     # Overall Assessment
-    overall_risk_level = Column(Enum("DecisionImpact"))
+    overall_risk_level = Column(Enum(DecisionImpact))
     overall_score = Column(Integer, CheckConstraint('overall_score BETWEEN 0 AND 100'))
     recommendations = Column(Text)
 
